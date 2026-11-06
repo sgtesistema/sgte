@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- CONTAINER TELA DIVIDIDA -->
+<div class="row vh-100 g-0">
+
+    <!-- LADO ESQUERDO: Banner/Logo Institucional (Oculto em telas de celular) -->
+    <div class="col-lg-6 d-none d-lg-flex bg-primary text-white justify-content-center align-items-center">
+        <div class="text-center p-5">
+            <h1 class="display-3 fw-bold mb-3">SGTE</h1>
+            <p class="lead fs-4">Sistema de Gestão de Turmas Especiais</p>
+            <hr class="w-25 mx-auto opacity-75 border-2 my-4">
+            <p class="fs-5">Crie sua conta  para ter acesso ao painel de matrículas, consultar turmas disponíveis e escolher seus horários.</p>
+        </div>
+    </div>
+
+    <!-- LADO DIREITO: Formulário de Cadastro -->
+    <div class="col-lg-6 d-flex justify-content-center align-items-center bg-light">
+        <div class="w-100 shadow-lg p-5 bg-white rounded" style="max-width: 500px;">
+
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-dark">Cadastro de Aluno</h2>
+                <p class="text-muted">Preencha os dados abaixo para criar sua conta</p>
+            </div>
+
+            <!-- FORMULÁRIO -->
+            <form method="post" action="{% url 'cadastrar_aluno' %}">
+                {% csrf_token %}
+
+                <!-- Erros gerais de validação -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger shadow-sm">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Campo Nome -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary">Nome Completo</label>
+                    {{ form.nome }}
+                    {% if form.nome.errors %}
+                        <div class="text-danger small mt-1 fw-bold">
+                            {% for error in form.nome.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Campo Matrícula -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary">Matrícula</label>
+                    {{ form.matricula }}
+                    {% if form.matricula.errors %}
+                        <div class="text-danger small mt-1 fw-bold">
+                            {% for error in form.matricula.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Campo Usuário -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-secondary">Nome de Usuário (Login)</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1 fw-bold">
+                            {% for error in form.username.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Campo Senha com as regras de Segurança -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-secondary">Senha</label>
+                    {{ form.senha }}
+
+                    <!-- AQUI APARECEM OS ERROS DE SEGURANÇA DA SENHA -->
+                    {% if form.senha.errors %}
+                        <div class="text-danger mt-2" style="font-size: 0.85em; font-weight: 600; line-height: 1.2;">
+                            {% for error in form.senha.errors %}
+                                <i class="bi bi-exclamation-triangle-fill"></i> {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="form-text mt-1 text-muted" style="font-size: 0.8em;">
+                            <i class="bi bi-info-circle"></i> A senha não pode ser muito comum ou composta apenas por números (min. 8 caracteres).
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Botão de Envio -->
+                <button type="submit" class="btn btn-primary w-100 py-2 mb-3 fw-bold fs-5 shadow-sm">
+                    Criar Minha Conta
+                </button>
+
+                <!-- Link de Voltar para o Login -->
+                <div class="text-center mt-4">
+                    <p class="mb-0 text-muted">Já possui matrícula no sistema?
+                        <a href="{% url 'login' %}" class="text-primary fw-bold text-decoration-none">Faça login aqui</a>
+                    </p>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

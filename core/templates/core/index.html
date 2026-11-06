@@ -1,0 +1,132 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<div class="container mt-4">
+    
+    <!-- MENSAGENS DE ALERTA GLOBAIS (Sucesso/Erro) -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- VISAO DO DIRETOR / PROFESSOR               -->
+
+    {% if is_admin %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary">Painel da Administração</h2>
+        </div>
+        
+        <div class="row">
+            {% for turma in turmas %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100 border-{% if turma.status_aberta %}success{% else %}danger{% endif %}">
+                        <div class="card-header bg-{% if turma.status_aberta %}success{% else %}danger{% endif %} text-white">
+                            <h5 class="mb-0">{{ turma.nome }}</h5>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-1"><strong>Período:</strong> {{ turma.get_periodo_display }}</p>
+                            <!-- NOME DO PROFESSOR -->
+                            <p class="card-text mb-1"><strong>Professor(a):</strong> {{ turma.professor.username|default:"A definir" }}</p>
+                            <p class="card-text text-muted">
+                                <small>Ocupação: {{ turma.alunos.count }} / {{ turma.limite_maximo }} vagas</small>
+                            </p>
+                            
+                            <p class="mb-4">
+                                <span class="badge bg-{% if turma.status_aberta %}success{% else %}danger{% endif %}">
+                                    {% if turma.status_aberta %}Aberta para Matrículas{% else %}Turma Fechada{% endif %}
+                                </span>
+                            </p>
+                            
+                            <!-- BOTÃO DO RELATÓRIO PDF -->
+                            <a href="{% url 'relatorio_turma' turma.id %}" target="_blank" class="btn btn-outline-dark w-100 mt-auto">
+                                🖨️ Gerar Relatório
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">Nenhuma turma cadastrada no sistema.</div>
+                </div>
+            {% endfor %}
+        </div>
+
+    <!-- VISAO DO ALUNO                             -->
+    {% else %}
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                
+                <!-- PAINEL DE TURMAS ATUAIS DO ALUNO -->
+                <div class="card shadow border-0 mb-5">
+                    <div class="card-header bg-primary text-white p-4">
+                        <h2 class="mb-0">Painel do Aluno</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <h4 class="text-success">Bem-vindo(a), {{ aluno.nome }}!</h4>
+                        <p class="text-muted mb-4">Matrícula: {{ aluno.matricula }}</p>
+                        
+                        <h5 class="mb-3 border-bottom pb-2">Minhas Turmas Atuais</h5>
+                        {% if minhas_turmas %}
+                            <div class="row">
+                                {% for minha_turma in minhas_turmas %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="p-3 border rounded bg-light border-success shadow-sm">
+                                            <h5 class="mb-1 text-success">{{ minha_turma.nome }}</h5>
+                                            <p class="mb-1 text-dark"><strong>Período:</strong> {{ minha_turma.get_periodo_display }}</p>
+                                            <!-- NOME DO PROFESSOR -->
+                                            <p class="mb-0 text-muted"><small><strong>Professor(a):</strong> {{ minha_turma.professor.username|default:"A definir" }}</small></p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                Você ainda não está matriculado em nenhuma turma. Escolha uma abaixo.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- VITRINE DE NOVAS TURMAS PARA MATRÍCULA -->
+                <h4 class="mb-3 text-secondary">Turmas com Vagas Abertas</h4>
+                <div class="row">
+                    {% for turma in turmas_disponiveis %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-primary shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column">
+                                    <h5 class="card-title text-primary">{{ turma.nome }}</h5>
+                                    <p class="card-text mb-1"><strong>Período:</strong> {{ turma.get_periodo_display }}</p>
+                                    <!-- NOME DO PROFESSOR -->
+                                    <p class="card-text mb-1"><strong>Professor(a):</strong> {{ turma.professor.username|default:"A definir" }}</p>
+                                    <p class="card-text text-muted mb-4">
+                                        <small>Vagas: {{ turma.alunos.count }} / {{ turma.limite_maximo }}</small>
+                                    </p>
+                                    
+                                    <form method="post" class="mt-auto">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="turma_id" value="{{ turma.id }}">
+                                        <button type="submit" class="btn btn-outline-success w-100" onclick="return confirm('Confirmar matrícula na turma {{ turma.nome }}?')">
+                                            + Adicionar Turma
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-warning shadow-sm">
+                                Não há turmas com vagas abertas disponíveis para nova matrícula no momento.
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

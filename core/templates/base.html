@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Escolar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            margin-bottom: 10px;
+        }
+        label { margin-bottom: 5px; font-weight: 500; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Menu Superior (Navbar) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <!-- AQUI ESTAVA O ERRO: Faltava o </a> no final desta linha -->
+            <a class="navbar-brand fw-bold" href="/">🏫 SGTE Sistema de Gestão de Turma Especiais</a>
+            
+            {% if user.is_authenticated %}
+                <div class="d-flex text-white align-items-center">
+                    <span class="me-3">Olá, {{ user.username }}</span>
+                    
+                    <!-- Só mostra o botão Admin se for o Superusuário (Diretor) -->
+                    {% if user.is_superuser %}
+                        <a href="/admin" class="btn btn-sm btn-outline-light me-2">⚙️ Admin</a>
+                    {% endif %}
+
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Sair</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

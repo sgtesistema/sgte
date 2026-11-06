@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    /* 1. Fundo e Centralização */
+    .tela-login-fundo {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    /* 2. Cartão blindado com CSS Grid (Força 50% / 50%) */
+    .cartao-login-grid {
+        display: grid;
+        grid-template-columns: 50% 50%; /* Metade exata para cada lado */
+        width: 100%;
+        max-width: 950px;
+        min-height: 550px;
+        background-color: #f6f7fb;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    /* 3. Lado da Imagem (Esquerda) */
+    .lado-imagem {
+        background-image: url('https://img.freepik.com/free-vector/telecommuting-concept-illustration_114360-1600.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 100%;
+        background-color: #e2e8f0; /* Cor de fallback */
+    }
+
+    /* 4. Lado do Formulário (Direita) */
+    .lado-form {
+        padding: 50px 10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #f6f7fb;
+    }
+
+    /* Regra para telemóveis: esconde a imagem e deixa o form ocupar 100% */
+    @media (max-width: 768px) {
+        .cartao-login-grid {
+            grid-template-columns: 100%;
+        }
+        .lado-imagem {
+            display: none;
+        }
+    }
+
+    /* 5. Estilos Internos (Textos e Inputs) */
+    .login-title {
+        color: #3f5eb5;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        font-size: 2.2rem;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .input-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .input-wrapper svg {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0b0c0;
+        pointer-events: none;
+    }
+
+    .input-box {
+        width: 100%;
+        padding: 12px 15px 12px 45px !important;
+        border: 2px solid #b0c4de;
+        border-radius: 6px;
+        background-color: #ffffff;
+        outline: none;
+        color: #333;
+    }
+    
+    .input-box:focus {
+        border-color: #7995d6;
+    }
+
+    .btn-submit {
+        background-color: #8ba2d4;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 12px;
+        width: 100%;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+    
+    .btn-submit:hover {
+        background-color: #718bc4;
+    }
+</style>
+
+<div class="tela-login-fundo">
+    <div class="cartao-login-grid">
+        
+        <!-- METADE ESQUERDA (IMAGEM) -->
+        <div class="lado-imagem"></div>
+
+        <!-- METADE DIREITA (FORMULÁRIO) -->
+        <div class="lado-form">
+            <h1 class="login-title">LOGIN</h1>
+            <p class="text-muted mb-4" style="font-size: 0.9rem;">Welcome back! Login to begin.</p>
+            
+            {% if form.errors %}
+                <div class="alert alert-danger py-2" style="border-radius: 6px; font-size: 0.85rem;">
+                    Usuário ou senha inválidos.
+                </div>
+            {% endif %}
+
+           <form method="post" autocomplete="off">
+                {% csrf_token %}
+                
+                <!-- CAMPO USERNAME -->
+                <div class="input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
+                    </svg>
+                    <!-- O autocomplete="new-password" força o navegador a não tentar preencher automaticamente -->
+                    <input type="text" name="username" id="campo_usuario" autocomplete="new-password" class="input-box" placeholder="Username" required tabindex="1">
+                </div>
+                
+                <!-- CAMPO PASSWORD -->
+                <div class="input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1"/>
+                    </svg>
+                    <input type="password" name="password" id="campo_senha" autocomplete="new-password" class="input-box" placeholder="Password" required tabindex="2">
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-4" style="font-size: 0.85rem;">
+                    <div>
+                        <input type="checkbox" id="check_lembrar" class="form-check-input" style="border-radius: 4px; border-color: #b0c4de;" tabindex="3"> 
+                        <label for="check_lembrar" class="text-muted ms-1" style="cursor: pointer;">Remember me</label>
+                    </div>
+                    <a href="{% url 'password_reset' %}" style="color: #3f5eb5; font-weight: 600; text-decoration: none;" tabindex="4">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-submit" tabindex="5">LOG IN</button>
+                
+                <div class="text-center mt-4" style="font-size: 0.85rem; color: #888;">
+                    Don't have account? <a href="/cadastrar/" style="color: #3f5eb5; font-weight: bold; text-decoration: none;" tabindex="6">Create an account</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
